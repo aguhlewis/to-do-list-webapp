@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>ToDo List in Vue.js</title>
+		<link text="text/css" rel="stylesheet" href="style.css"/>
+    </head>
+
+    <body>
+        <!-- Main div holding our application data -->
+        <div class="container" id="app">
+			<h3>{{ title }}</h3>
+			
+			<!-- Panel for holding our input -->
+			<section class="panel">
+				<input type="checkbox" id="mark-all" v-bind:checked="areAllSelected" v-on:click="selectAll"/>
+				<input type="text" placeholder="what do you need to do?" autofocus class="text-input" v-model="text" v-on:keyup.enter="addTodo()">
+				<button v-on:click="clearTodo()">Clear List</button>
+			</section>
+
+			<!-- unordered list for holidng our todo items-->
+            <ul class="list">
+                <li v-for="item in list" v-bind:class="{done: item.checked}">
+					<input type="checkbox" class="checkbox" v-model="item.checked"/>
+                    <span>{{ item.text }}</span>
+                    <button class="delete" v-on:click="removeTodo(item)">X</button>
+                </li>
+            </ul>
+        </div>
+
+        <!-- scripts JS -->
+        <script src="vue.js"></script>
+        <script>
+			//create a new Vue instance
+            new Vue({
+				//bind this new instance with our container div with id of app
+                el: '#app',
+				
+				//this is where we will register the values that holds data for our application
+                data: {
+					title: 'TODO LIST APP WITH VUE.JS',
+                    text: '',
+                    list: []
+                },
+				
+				//this is where we will hold the methods we want to use in our application
+                methods: {
+                    addTodo() {
+						//trim() is used to remove whitespaces from both ends of a string
+						var item = this.text.trim();
+						
+						//if item is not an empty string
+						if(item) {
+						//push an object containing the item to the list array
+							this.list.push({
+								text: item,
+								checked: false
+							})
+							//reset text to an empty field so the input field is cleared
+							this.text = ''
+						}
+                    },
+
+                    removeTodo(item) {
+						var index = this.list.indexOf(item);
+                        this.list.splice(index, 1)
+                    },
+					
+					clearTodo() {
+						//setting list to an empty array clears the whole list
+						this.list = [];
+					},
+					
+					selectAll(item) {
+						//target value is set to the opposite of areAllSelected
+						var targetValue = this.areAllSelected ? false : true;
+						//we use a for loop to set the checked state of all items to the target value
+						for (var i = 0; i < this.list.length; i++) {
+							this.list[i].checked = targetValue;
+						}
+					}
+                },
+				
+				computed: {
+					areAllSelected() {
+						//check if every checked property returns true and if there is at least one to-do item
+						return this.list.every(function(item) {
+							return item.checked;
+						}) && this.list.length > 0;
+					}
+				}
+            })
+        </script>
+    </body>
+</html>
